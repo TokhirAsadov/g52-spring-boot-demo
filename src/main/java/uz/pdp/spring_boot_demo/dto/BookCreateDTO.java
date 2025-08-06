@@ -1,0 +1,38 @@
+package uz.pdp.spring_boot_demo.dto;
+
+public class BookCreateDTO {
+    private String title;
+    private String author;
+
+    public BookCreateDTO() {
+    }
+
+    public BookCreateDTO(String title, String author) {
+        this.title = title;
+        this.author = author;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getAuthor() {
+        return author;
+    }
+
+    public void setAuthor(String author) {
+        this.author = author;
+    }
+
+    @Override
+    public String toString() {
+        return "BookCreateDTO{" +
+                "title='" + title + '\'' +
+                ", author='" + author + '\'' +
+                '}';
+    }
+}

@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+>
+<head>
+    <meta charset="UTF-8">
+    <title>Book Create Page</title>
+</head>
+<body>
+
+<form method="post" th:action="@{/book/create}" >
+    <label>Book title: <input type="text" name="title" placeholder="Enter book title"></label>
+    <br>
+    <label>Book author: <input type="text" name="author" placeholder="Enter book author"></label>
+    <br>
+    <input type="submit">
+</form>
+</body>
+</html>
