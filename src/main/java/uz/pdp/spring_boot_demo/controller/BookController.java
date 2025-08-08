@@ -1,12 +1,12 @@
 package uz.pdp.spring_boot_demo.controller;
 
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
 import uz.pdp.spring_boot_demo.dto.BookCreateDTO;
+import uz.pdp.spring_boot_demo.entity.Book;
 
 
 @Controller
@@ -28,6 +28,36 @@ public class BookController {
         String sql = "insert into books(title, author) values (?, ?);";
         jdbcTemplate.update(sql,dto.getTitle(),dto.getAuthor());
         return "redirect:/";
+    }
+
+    @PostMapping("/book/update")
+    public String bookUpdate(@ModelAttribute Book update){
+        String sql = "update books set title = ?, author = ? where id = ?";
+        jdbcTemplate.update(sql, update.getTitle(), update.getAuthor(), update.getId());
+        return "redirect:/";
+    }
+
+    @DeleteMapping("/book/delete/{id}")
+    public String bookDelete(@PathVariable(name = "id") Integer id){
+        // /book/delete/{id}
+        // /book/delete/1
+        // /book/delete/2
+        // /book/delete/10
+
+        String sql = "delete from books where id = ?";
+        jdbcTemplate.update(sql, id);
+
+        return "redirect:/";
+    }
+
+    @GetMapping("/book/detailsForUpdate/{id}")
+    public String getBookDetailsForUpdating(@PathVariable(name = "id") Integer id, Model model){
+        String sql = "select * from books where id = ?";
+        var mapper = BeanPropertyRowMapper.newInstance(Book.class);
+        Book book = jdbcTemplate.queryForObject(sql, mapper, id);
+        model.addAttribute("book",book);
+        System.out.println(book);
+        return "book_update";
     }
 
 
