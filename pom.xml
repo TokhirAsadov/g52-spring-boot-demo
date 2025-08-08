@@ -75,6 +75,7 @@
 	</dependencies>
 
 	<build>
+		<finalName>g52-app</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
