@@ -1,10 +1,9 @@
 package uz.pdp.spring_boot_demo.controller;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import uz.pdp.spring_boot_demo.dto.Todo;
 
 import java.util.ArrayList;
@@ -23,11 +22,12 @@ public class TodoController {
             consumes = "application/json",// content-type bilan javob olish mumkin
             produces = {"application/xml", "application/json"}
     )
-    public List<Todo> getTodo(){
-        todos.add(new Todo(UUID.randomUUID(),"salom todo"));
-        todos.add(new Todo(UUID.randomUUID(),"alik todo"));
+    public ResponseEntity<List<Todo>> getTodo() {
+        todos.add(new Todo(UUID.randomUUID(), "salom todo"));
+        todos.add(new Todo(UUID.randomUUID(), "alik todo"));
         System.out.println("+++++++++++++++++=");
-        return todos;
+//        return new ResponseEntity<>(todos, HttpStatus.OK);
+        return ResponseEntity.ok(todos);
     }
 
     /*@GetMapping("/todo/{id}/{name}")
@@ -42,12 +42,29 @@ public class TodoController {
     }*/
 
     @GetMapping("/todo/{id}")
-    public Todo getTodoById(
+    public ResponseEntity<Todo> getTodoById(
             @PathVariable(name = "id") UUID todoId
-    ){
-        return todos.stream().filter(todo -> todo.getId().equals(todoId))
+    ) {
+        Todo todo1 = todos.stream().filter(todo -> todo.getId().equals(todoId))
                 .findFirst()
                 .orElseThrow(() -> new RuntimeException("Todo not found"));
+        return ResponseEntity.ok(todo1);
+    }
+
+    @PostMapping("/todo/create")
+//    @ResponseStatus(HttpStatus.CREATED)
+    public ResponseEntity<Boolean> create(@RequestBody Todo todo) {
+        todos.add(todo);
+        return ResponseEntity.status(HttpStatus.CREATED).body(true);
+    }
+
+    @PutMapping("/todo/update")
+    public ResponseEntity<Boolean> update(@RequestBody Todo todo) {
+        Todo oldTodo = todos.stream().filter(todo1 -> todo1.getId().equals(todo.getId()))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("Todo not fount"));
+        oldTodo.setTitle(todo.getTitle());
+        return ResponseEntity.status(200).body(true);
     }
 
 
