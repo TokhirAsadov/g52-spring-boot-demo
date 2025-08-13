@@ -40,4 +40,25 @@ public class StudentController {
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
+    @PutMapping("/update")
+    @Transactional
+    public ResponseEntity<Void> update(@RequestBody Student student){
+        boolean existsById = studentRepository.existsById(student.getId());
+        if (existsById){
+            Student oldStudent = studentRepository.findById(student.getId()).get();
+            oldStudent.setAge(student.getAge());
+            oldStudent.setFullName(student.getFullName());
+            studentRepository.save(oldStudent);
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        }
+        else {
+            return ResponseEntity.status(404).body(null);
+        }
+    }
+
+    @DeleteMapping("/deleteById/{id}")
+    public ResponseEntity<String> deleteById(@PathVariable Integer id){
+        studentRepository.deleteById(id);
+        return ResponseEntity.ok("Student delete qilindi");
+    }
 }
