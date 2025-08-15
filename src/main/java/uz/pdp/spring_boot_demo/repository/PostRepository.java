@@ -32,4 +32,6 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
     @Query(value = "delete from posts where id=?1;",nativeQuery = true)
     void deletePost(Integer id);
 
+    @Query("from Post where userId in ?1 order by title")
+    List<Post> findPostsByUserIds(List<Integer> ids);
 }

@@ -1,5 +1,8 @@
 package uz.pdp.spring_boot_demo.controller;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -11,6 +14,7 @@ import uz.pdp.spring_boot_demo.repository.PostRepository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/post")
@@ -76,6 +80,29 @@ public class PostController {
         return ResponseEntity.ok(posts);
     }
 
+    @GetMapping("/findAllPageV1")
+    public ResponseEntity<List<Post>> findAllPageV1(
+            @RequestParam(name = "page") Integer page,
+            @RequestParam(name = "size") Integer size
+    ){
+        List<Post> posts = postRepository.findAll()
+                .stream()
+                .skip((long) (page - 1) * size)
+                .limit(size)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(posts);
+    }
+
+    @GetMapping("/findAllPageV2")
+    public ResponseEntity<Page<Post>> findAllPageV2(
+            @RequestParam(name = "page") Integer page,
+            @RequestParam(name = "size") Integer size
+    ){
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Post> posts = postRepository.findAll(pageable);
+        return ResponseEntity.ok(posts);
+    }
+
     @GetMapping("/findAllV2")
     public ResponseEntity<List<Post>> findAllV2(){
         List<Post> posts = postRepository.getAllPosts();
@@ -104,6 +131,12 @@ public class PostController {
     public ResponseEntity<Post> findByIdV3(@PathVariable Integer id){
         Post post = postRepository.getPostByIdNativeQuery(id);
         return ResponseEntity.ok(post);
+    }
+
+    @GetMapping("/findPostsByUserIds")
+    public ResponseEntity<List<Post>> findPostsByUserIds(@RequestParam(name = "ids") List<Integer> ids){
+        List<Post> posts = postRepository.findPostsByUserIds(ids);
+        return ResponseEntity.ok(posts);
     }
 
 }
