@@ -9,7 +9,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+import uz.pdp.spring_boot_demo.dto.IPostDTO;
 import uz.pdp.spring_boot_demo.dto.PostCreator;
+import uz.pdp.spring_boot_demo.dto.PostDTO;
 import uz.pdp.spring_boot_demo.dto.PostUpdator;
 import uz.pdp.spring_boot_demo.entity.Post;
 import uz.pdp.spring_boot_demo.repository.PostRepository;
@@ -171,5 +173,23 @@ public class PostController {
         }
 
 
+    }
+
+    @GetMapping("/getPostDetails")
+    public ResponseEntity<List<IPostDTO>> getPostDetails(){
+        List<IPostDTO> posts = postRepository.getPostDetails();
+        return ResponseEntity.ok(posts);
+    }
+
+    @GetMapping("/getPostDetailsV2")
+    public ResponseEntity<List<PostDTO>> getPostDetailsV2(){
+        List<PostDTO> posts = postRepository.getPostDetailsV2();
+        return ResponseEntity.ok(posts);
+    }
+
+    @GetMapping("/getPostDetailsV3")
+    public ResponseEntity<List<PostDTO>> getPostDetailsV3(){
+        List<PostDTO> posts = postRepository.getPostDetailsV3();
+        return ResponseEntity.ok(posts);
     }
 }

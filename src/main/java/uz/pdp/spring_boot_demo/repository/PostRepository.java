@@ -5,6 +5,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.transaction.annotation.Transactional;
+import uz.pdp.spring_boot_demo.dto.IPostDTO;
+import uz.pdp.spring_boot_demo.dto.PostDTO;
 import uz.pdp.spring_boot_demo.entity.Post;
 
 import java.util.List;
@@ -16,14 +18,10 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
 
 
     Boolean existsByUserId(Integer userId);
-
-
     List<Post> findAllByUserId(Integer userId);
-
     List<Post> findAllByUserIdGreaterThan(Integer userId);
     List<Post> findAllByUserIdGreaterThanEqual(Integer userId);
     List<Post> findAllByUserIdBetween(Integer userId, Integer userId2);
-
     List<Post> findAllByUserIdLessThanAndTitleStartingWith(Integer userId, String title);
     List<Post> findAllByUserIdLessThanOrTitleStartingWith(Integer userId, String title);
 
@@ -54,4 +52,16 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
 
     @Query("select p from Post p")
     List<Post> getPostsByIds(Sort sort);
+
+    // native query
+    @Query(nativeQuery = true,value = "select id, title, body from posts;")
+    List<IPostDTO> getPostDetails();
+
+    // native query
+    @Query(name = "Post.Native.ClassDTO.Projection",nativeQuery = true)
+    List<PostDTO> getPostDetailsV3();
+
+    // jpql
+    @Query("select new uz.pdp.spring_boot_demo.dto.PostDTO(p.id, p.title) from Post p")
+    List<PostDTO> getPostDetailsV2();
 }
