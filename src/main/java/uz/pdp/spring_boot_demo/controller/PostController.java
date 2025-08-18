@@ -1,8 +1,10 @@
 package uz.pdp.spring_boot_demo.controller;
 
+import org.hibernate.query.Order;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,6 +14,7 @@ import uz.pdp.spring_boot_demo.dto.PostUpdator;
 import uz.pdp.spring_boot_demo.entity.Post;
 import uz.pdp.spring_boot_demo.repository.PostRepository;
 
+import javax.naming.ldap.SortKey;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -139,4 +142,34 @@ public class PostController {
         return ResponseEntity.ok(posts);
     }
 
+    @GetMapping("/getPostsByIds")
+    public ResponseEntity<List<Post>> getPostsByIds(){
+//        Sort sort = Sort.by("title")
+//                .and(Sort.by("userId"));
+        Sort sort = Sort.by(Sort.Order.desc("title"))
+                .and(Sort.by(Sort.Order.asc("userId")));
+        List<Post> posts = postRepository.getPostsByIds(sort);
+        return ResponseEntity.ok(posts);
+    }
+
+
+    @GetMapping("/getPostsUserId")
+    public ResponseEntity<Post> getPostsWhereUserIdBig6(){
+//        List<Post> posts = postRepository.getPostsWhereUserIdBig6();
+
+//        List<Post> posts = postRepository.findAllByUserIdGreaterThanEqual(9);
+//        List<Post> posts = postRepository.findAllByUserIdBetween(2,4);
+//        List<Post> posts = postRepository.findAllByUserIdLessThanAndTitleStartingWith(9,"a");
+//        List<Post> posts = postRepository.findAllByUserIdLessThanOrTitleStartingWith(5,"a");
+
+        boolean existsById = postRepository.existsById(111);
+        if(existsById){
+            return ResponseEntity.ok(postRepository.findById(3).get());
+        }
+        else {
+            return ResponseEntity.status(404).build();
+        }
+
+
+    }
 }

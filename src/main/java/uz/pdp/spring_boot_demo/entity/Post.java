@@ -41,3 +41,4 @@ public class Post {
     @Column(nullable = false)
     private String body;
 }
+// 3 < id 8 OR body start with "b"

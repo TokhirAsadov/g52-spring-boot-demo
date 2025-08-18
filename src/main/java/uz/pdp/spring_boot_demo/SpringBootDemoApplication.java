@@ -21,7 +21,7 @@ public class SpringBootDemoApplication {
 	}
 
 	/*@Bean*/
-	ApplicationRunner runner(PostRepository postRepository, ObjectMapper objectMapper){
+	ApplicationRunner ruqnner(PostRepository postRepository, ObjectMapper objectMapper){
 		return (args -> {
 			URL url = new URL("https://jsonplaceholder.typicode.com/posts");
 			List<Post> posts = objectMapper.readValue(url, new TypeReference<>() {

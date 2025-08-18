@@ -1,5 +1,6 @@
 package uz.pdp.spring_boot_demo.repository;
 
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -9,6 +10,22 @@ import uz.pdp.spring_boot_demo.entity.Post;
 import java.util.List;
 
 public interface PostRepository extends JpaRepository<Post, Integer> {
+
+    @Query(nativeQuery = true, value = "select * from posts where user_id > 6")
+    List<Post> getPostsWhereUserIdBig6();
+
+
+    Boolean existsByUserId(Integer userId);
+
+
+    List<Post> findAllByUserId(Integer userId);
+
+    List<Post> findAllByUserIdGreaterThan(Integer userId);
+    List<Post> findAllByUserIdGreaterThanEqual(Integer userId);
+    List<Post> findAllByUserIdBetween(Integer userId, Integer userId2);
+
+    List<Post> findAllByUserIdLessThanAndTitleStartingWith(Integer userId, String title);
+    List<Post> findAllByUserIdLessThanOrTitleStartingWith(Integer userId, String title);
 
     @Query(name = "Post.FindAll")
     List<Post> getAllPosts();
@@ -34,4 +51,7 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
 
     @Query("from Post where userId in ?1 order by title")
     List<Post> findPostsByUserIds(List<Integer> ids);
+
+    @Query("select p from Post p")
+    List<Post> getPostsByIds(Sort sort);
 }
