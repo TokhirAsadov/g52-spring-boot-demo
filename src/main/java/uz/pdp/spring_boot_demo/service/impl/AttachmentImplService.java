@@ -79,4 +79,26 @@ public class AttachmentImplService implements AttachmentService {
         return ResponseEntity.status(404)
                 .body("File not found with id: " + id);
     }
+
+    @Override
+    public void uploadSingleFile(MultipartFile file) throws IOException {
+        if (file!=null) {
+            boolean exists = attachmentRepository.existsByOriginalName(file.getOriginalFilename());
+            if (exists){
+                throw new RuntimeException("File with name "+file.getOriginalFilename()+" already exists");
+            }
+            Attachment attachment = Attachment.builder()
+                    .originalName(file.getOriginalFilename())
+                    .size(file.getSize())
+                    .contentType(file.getContentType())
+                    .fileName(UUID.randomUUID().toString())
+                    .build();
+            Attachment saved = attachmentRepository.save(attachment);
+            AttachmentContent attachmentContent = AttachmentContent.builder()
+                    .attachment(saved)
+                    .bytes(file.getBytes())
+                    .build();
+            attachmentContentRepository.save(attachmentContent);
+        }
+    }
 }
