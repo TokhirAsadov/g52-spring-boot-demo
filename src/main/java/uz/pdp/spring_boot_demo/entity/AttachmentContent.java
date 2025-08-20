@@ -19,9 +19,7 @@ public class AttachmentContent {
     @Column(name = "id", updatable = false, nullable = false, columnDefinition = "uuid default uuid_generate_v4()")
     private UUID id;
 
-    @Lob
-    @Basic(fetch = FetchType.LAZY)
-    @Column(nullable = false, name = "bytes")
+    @Column(nullable = false, name = "bytes", columnDefinition = "bytea")
     private byte[] bytes;
 
 
