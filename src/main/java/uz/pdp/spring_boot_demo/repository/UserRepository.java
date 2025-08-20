@@ -6,8 +6,8 @@ import uz.pdp.spring_boot_demo.dto.IUserDTO;
 import uz.pdp.spring_boot_demo.entity.User;
 
 public interface UserRepository extends JpaRepository<User, Long> {
-    boolean existsByUsername(String username);
+    boolean existsByEmail(String email);
 
-    @Query(value = "select id, full_name, username from users where id = ?1 limit 1;", nativeQuery = true)
+    @Query(value = "select id, full_name, email from users where id = ?1 limit 1;", nativeQuery = true)
     IUserDTO getUserById(Long userId);
 }
