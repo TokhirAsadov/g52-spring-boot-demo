@@ -1,6 +1,8 @@
 package uz.pdp.spring_boot_demo.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.Link;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -10,6 +12,10 @@ import uz.pdp.spring_boot_demo.entity.User;
 import uz.pdp.spring_boot_demo.repository.UserRepository;
 
 import java.util.List;
+import java.util.UUID;
+
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @RestController
 @RequestMapping("/user")
@@ -41,7 +47,13 @@ public class UserController {
     }
 
     @GetMapping("/findById/{id}")
-    public ResponseEntity<IUserDTO> findById(@PathVariable Long id){
-        return ResponseEntity.ok(userRepository.getUserById(id));
+    public ResponseEntity<EntityModel<IUserDTO>> findById(@PathVariable Long id){
+        IUserDTO data = userRepository.getUserById(id);
+        EntityModel<IUserDTO> model = EntityModel.of(data);
+        model.add(linkTo(methodOn(UserController.class).findById(id)).withSelfRel());
+        model.add(linkTo(methodOn(UserController.class).findAll()).withRel("users"));
+        model.add(linkTo(methodOn(UserController.class).create(new UserCreator("xxx xxx","xxx@gmail.com"))).withRel("create").expand().withName("POST"));
+        model.add(linkTo(methodOn(AttachmentController.class).download(UUID.randomUUID(),null)).withRel("download-attachment").expand().withName("GET"));
+        return ResponseEntity.ok(model);
     }
 }
