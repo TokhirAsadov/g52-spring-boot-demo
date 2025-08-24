@@ -19,7 +19,13 @@ import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.util.InMemoryResource;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.AccessDeniedHandler;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import uz.pdp.spring_boot_demo.dto.AuthErrorDTO;
+
+import java.util.List;
 
 @Configuration
 @EnableWebSecurity
@@ -36,27 +42,18 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http, ObjectMapper jacksonObjectMapper) throws Exception {
 
         http
+                .cors(cors -> {
+                    cors.configurationSource(corsConfigurationSource());
+                })
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-//                        .requestMatchers("/login").permitAll()
                         .anyRequest().fullyAuthenticated()
                 )
                 .httpBasic((httpBasicConfigurer) -> {
                 })
                 .exceptionHandling(ex -> ex
-                        .authenticationEntryPoint(((request, response, authException) -> {
-                            authException.printStackTrace();
-                            System.out.println("****************************************");
-                            String errorPath = request.getRequestURI();
-                            String errorMessage = authException.getMessage() + ". You are not authorized to access this resource";
-                            AuthErrorDTO authErrorDTO = new AuthErrorDTO(errorMessage, errorPath, 401);
-                            System.out.println("****************************************2");
-                            response.sendError(401);
-                            ServletOutputStream outputStream = response.getOutputStream();
-                            System.out.println("****************************************3");
-                            objectMapper.writeValue(outputStream, authErrorDTO);
-                            System.out.println("****************************************4");
-                        }))
+                        .authenticationEntryPoint(authenticationEntryPoint())
+                        .accessDeniedHandler(accessDeniedHandler())
                 )
 
         ;
@@ -65,21 +62,52 @@ public class SecurityConfig {
     }
 
     @Bean
-    public AuthenticationEntryPoint customAuthenticationEntryPoint() {
-        return (request, response, authException) -> {
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        //configuration.setAllowedOrigins(List.of("localhost:3000","http://localhost:3000","http://localhost:8080"));
+        configuration.setAllowedOrigins(List.of("*"));
+        configuration.addAllowedOriginPattern("*");
+        configuration.setAllowedHeaders(List.of("*"));
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE","PATCH"));
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/api/v1/**", configuration);
+
+
+//        CorsConfiguration configuration2 = new CorsConfiguration();
+//        //configuration.setAllowedOrigins(List.of("localhost:3000","http://localhost:3000","http://localhost:8080"));
+//        configuration.setAllowedOrigins(List.of("*"));
+//        configuration.addAllowedOriginPattern("*");
+//        configuration.setAllowedHeaders(List.of("*"));
+//        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE","PATCH"));
+//        source.registerCorsConfiguration("/api/v2/**", configuration2);
+        return source;
+    }
+
+
+    @Bean
+    public AccessDeniedHandler accessDeniedHandler(){
+        return ((request, response, authException) -> {
             authException.printStackTrace();
-            System.out.println("****************************************");
+            String errorPath = request.getRequestURI();
+            String errorMessage = authException.getMessage() + ". You do not have permission or role to access this resource";
+            AuthErrorDTO authErrorDTO = new AuthErrorDTO(errorMessage, errorPath, 403);
+            response.setStatus(403);
+            ServletOutputStream outputStream = response.getOutputStream();
+            objectMapper.writeValue(outputStream, authErrorDTO);
+        });
+    }
+
+    @Bean
+    public AuthenticationEntryPoint authenticationEntryPoint(){
+        return ((request, response, authException) -> {
+            authException.printStackTrace();
             String errorPath = request.getRequestURI();
             String errorMessage = authException.getMessage() + ". You are not authorized to access this resource";
             AuthErrorDTO authErrorDTO = new AuthErrorDTO(errorMessage, errorPath, 401);
-            System.out.println("****************************************2");
-            response.sendError(401);
+            response.setStatus(401);
             ServletOutputStream outputStream = response.getOutputStream();
-            System.out.println("****************************************3");
             objectMapper.writeValue(outputStream, authErrorDTO);
-            System.out.println("****************************************4");
-//                            outputStream.flush();
-        };
+        });
     }
 
     @Bean
