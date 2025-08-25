@@ -47,10 +47,11 @@ public class SecurityConfig {
                 })
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/api/auth/**").permitAll()
                         .anyRequest().fullyAuthenticated()
                 )
-                .httpBasic((httpBasicConfigurer) -> {
-                })
+//                .httpBasic((httpBasicConfigurer) -> {
+//                })
                 .exceptionHandling(ex -> ex
                         .authenticationEntryPoint(authenticationEntryPoint())
                         .accessDeniedHandler(accessDeniedHandler())
